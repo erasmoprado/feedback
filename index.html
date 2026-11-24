@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avaliação da Culminância</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Bibliotecas gratuitas via CDN para QR Code e Confetes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- Barra de Navegação -->
+  <header class="navbar">
+    <div class="logo">🎓 Culminância</div>
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="mudarAba('avaliar')">Avaliar</button>
+      <button class="tab-btn" onclick="mudarAba('qrcode')">QR Code</button>
+      <button class="tab-btn" onclick="mudarAba('resultados')">Resultados</button>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <!-- ABA 1: FORMULÁRIO DO ALUNO -->
+    <section id="aba-avaliar" class="aba ativa">
+      <div class="card" id="card-formulario">
+        <span class="badge">Feedback da Apresentação</span>
+        <h1>O que você achou?</h1>
+        <p class="subtitulo">Sua opinião é muito importante para nossa equipe!</p>
+
+        <form id="form-avaliacao">
+          <!-- Nome -->
+          <div class="campo">
+            <label for="nome">Seu Nome (opcional)</label>
+            <input type="text" id="nome" placeholder="Ex: Maria Silva ou Anônimo">
+          </div>
+
+          <!-- Turma -->
+          <div class="campo">
+            <label for="turma">Sua Turma / Série</label>
+            <input type="text" id="turma" placeholder="Ex: 2º Ano B" required>
+          </div>
+
+          <!-- Avaliação por Estrelas -->
+          <div class="campo">
+            <label>Nota Geral da Apresentação *</label>
+            <div class="estrelas" id="estrelas-container">
+              <span class="estrela" data-valor="1">★</span>
+              <span class="estrela" data-valor="2">★</span>
+              <span class="estrela" data-valor="3">★</span>
+              <span class="estrela" data-valor="4">★</span>
+              <span class="estrela" data-valor="5">★</span>
+            </div>
+            <small id="texto-nota" class="texto-ajuda">Toque nas estrelas para dar uma nota</small>
+          </div>
+
+          <!-- Pontos Positivos (Tags) -->
+          <div class="campo">
+            <label>O que mais chamou sua atenção?</label>
+            <div class="tags-container" id="tags-container">
+              <button type="button" class="tag" data-tag="Criatividade">💡 Criatividade</button>
+              <button type="button" class="tag" data-tag="Domínio do Assunto">🧠 Domínio do Assunto</button>
+              <button type="button" class="tag" data-tag="Slides / Visual">🎨 Slides / Visual</button>
+              <button type="button" class="tag" data-tag="Oratória / Clareza">🎤 Oratória / Clareza</button>
+              <button type="button" class="tag" data-tag="Organização">📋 Organização</button>
+              <button type="button" class="tag" data-tag="Dinâmica / Interação">🤝 Interação</button>
+            </div>
+          </div>
+
+          <!-- Comentário -->
+          <div class="campo">
+            <label for="comentario">Deixe um comentário ou sugestão</label>
+            <textarea id="comentario" rows="3" placeholder="Escreva aqui o que você gostou ou o que podemos melhorar..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-primario">Enviar Avaliação 🚀</button>
+        </form>
+      </div>
+
+      <!-- Tela de Sucesso após enviar -->
+      <div class="card oculto texto-centro" id="card-sucesso">
+        <div class="icone-sucesso">🎉</div>
+        <h2>Avaliação Enviada!</h2>
+        <p class="subtitulo">Muito obrigado por participar e avaliar nossa culminância.</p>
+        <button class="btn-secundario" onclick="novoFeedback()">Enviar outra avaliação</button>
+      </div>
+    </section>
+
+    <!-- ABA 2: QR CODE PARA PROJETAR NO TELÃO -->
+    <section id="aba-qrcode" class="aba">
+      <div class="card texto-centro">
+        <span class="badge">Escaneie com o celular</span>
+        <h1>Avalie Nossa Apresentação!</h1>
+        <p class="subtitulo">Aponte a câmera do seu celular para o QR Code abaixo e deixe seu feedback.</p>
+        
+        <div class="qr-box">
+          <div id="qrcode"></div>
+        </div>
+
+        <p class="link-atual" id="url-display"></p>
+        <button class="btn-secundario" onclick="copiarLink()">📋 Copiar Link da Página</button>
+      </div>
+    </section>
+
+    <!-- ABA 3: PAINEL DE RESULTADOS -->
+    <section id="aba-resultados" class="aba">
+      <div class="grid-resumo">
+        <div class="card resumo-item">
+          <span class="resumo-label">Média Geral</span>
+          <strong class="resumo-valor" id="media-geral">0.0 ⭐</strong>
+        </div>
+        <div class="card resumo-item">
+          <span class="resumo-label">Total de Avaliações</span>
+          <strong class="resumo-valor" id="total-avaliacoes">0</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cabecalho-lista">
+          <h2>Destaques mais votados</h2>
+        </div>
+        <div id="resumo-tags" class="tags-resumo-lista">
+          <p class="vazio">Nenhuma avaliação registrada ainda.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cabecalho-lista">
+          <h2>Comentários dos Alunos</h2>
+          <div class="acoes-dados">
+            <button class="btn-pequeno" onclick="exportarCSV()">📥 Baixar CSV</button>
+            <button class="btn-pequeno btn-perigo" onclick="limparDados()">🗑️ Limpar</button>
+          </div>
+        </div>
+        <div id="lista-comentarios" class="comentarios-lista">
+          <p class="vazio">Nenhum comentário recebido ainda.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
