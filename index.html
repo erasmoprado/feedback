@@ -15,9 +15,9 @@
   <header class="navbar">
     <div class="logo">🎓 Culminância</div>
     <nav class="nav-tabs">
-      <button class="tab-btn active" onclick="mudarAba('avaliar')">Avaliar</button>
-      <button class="tab-btn" onclick="mudarAba('qrcode')">QR Code</button>
-      <button class="tab-btn" onclick="mudarAba('resultados')">Resultados</button>
+      <button class="tab-btn active" onclick="mudarAba('avaliar', this)">Avaliar</button>
+      <button class="tab-btn" onclick="mudarAba('qrcode', this)">QR Code</button>
+      <button class="tab-btn" onclick="mudarAba('resultados', this)">Resultados</button>
     </nav>
   </header>
 
@@ -35,12 +35,6 @@
           <div class="campo">
             <label for="nome">Seu Nome (opcional)</label>
             <input type="text" id="nome" placeholder="Ex: Maria Silva ou Anônimo">
-          </div>
-
-          <!-- Turma -->
-          <div class="campo">
-            <label for="turma">Sua Turma / Série</label>
-            <input type="text" id="turma" placeholder="Ex: 2º Ano B" required>
           </div>
 
           <!-- Avaliação por Estrelas -->
@@ -128,7 +122,7 @@
 
       <div class="card">
         <div class="cabecalho-lista">
-          <h2>Comentários dos Alunos</h2>
+          <h2>Comentários</h2>
           <div class="acoes-dados">
             <button class="btn-pequeno" onclick="exportarCSV()">📥 Baixar CSV</button>
             <button class="btn-pequeno btn-perigo" onclick="limparDados()">🗑️ Limpar</button>
