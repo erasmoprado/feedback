@@ -19,12 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Alternar entre abas (Avaliar, QR Code, Resultados)
-function mudarAba(nomeAba) {
+function mudarAba(nomeAba, botaoClicado) {
   document.querySelectorAll('.aba').forEach(aba => aba.classList.remove('ativa'));
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
   document.getElementById(`aba-${nomeAba}`).classList.add('ativa');
-  event.target.classList.add('active');
+  if (botaoClicado) {
+    botaoClicado.classList.add('active');
+  }
 
   if (nomeAba === 'resultados') {
     atualizarPainelResultados();
@@ -79,7 +81,6 @@ document.getElementById('form-avaliacao').addEventListener('submit', (e) => {
   const novaAvaliacao = {
     id: Date.now(),
     nome: document.getElementById('nome').value.trim() || 'Anônimo',
-    turma: document.getElementById('turma').value.trim(),
     nota: notaSelecionada,
     tags: [...tagsSelecionadas],
     comentario: document.getElementById('comentario').value.trim(),
@@ -179,12 +180,12 @@ function atualizarPainelResultados() {
     containerTags.innerHTML = '<p class="vazio">Nenhum destaque marcado ainda.</p>';
   }
 
-  // Listar Comentários
+  // Listar Comentários (apenas com o nome)
   const listaComentarios = document.getElementById('lista-comentarios');
   listaComentarios.innerHTML = avaliacoes.map(av => `
     <div class="comentario-item">
       <div class="comentario-topo">
-        <strong>${av.nome} <small style="color:#64748b">(${av.turma})</small></strong>
+        <strong>${av.nome}</strong>
         <span>${'⭐'.repeat(av.nota)}</span>
       </div>
       ${av.tags.length ? `<small style="color:#4f46e5">${av.tags.join(' • ')}</small>` : ''}
@@ -193,7 +194,7 @@ function atualizarPainelResultados() {
   `).join('');
 }
 
-// Exportar resultados para Excel / CSV
+// Exportar resultados para Excel / CSV (sem a coluna Turma)
 function exportarCSV() {
   const avaliacoes = obterAvaliacoes();
   if (avaliacoes.length === 0) {
@@ -201,10 +202,10 @@ function exportarCSV() {
     return;
   }
 
-  let csv = 'Nome;Turma;Nota;Destaques;Comentario;Horario\n';
+  let csv = 'Nome;Nota;Destaques;Comentario;Horario\n';
   avaliacoes.forEach(av => {
     const comentarioLimpo = av.comentario.replace(/(\r\n|\n|\r|;)/gm, ' ');
-    csv += `${av.nome};${av.turma};${av.nota};"${av.tags.join(', ')}";"${comentarioLimpo}";${av.data}\n`;
+    csv += `${av.nome};${av.nota};"${av.tags.join(', ')}";"${comentarioLimpo}";${av.data}\n`;
   });
 
   const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
